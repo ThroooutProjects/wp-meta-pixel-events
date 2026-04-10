@@ -1,0 +1,49 @@
+<?php
+
+if (!defined('ABSPATH')) {
+    exit;
+}
+
+/**
+ * GitHub updater integration.
+ *
+ * Uses the Plugin Update Checker library (YahnisElsts/plugin-update-checker).
+ * The library is optional: if it's not installed, this file does nothing.
+ */
+function mpe_boot_updater(): void
+{
+    $factory_candidates = [
+        'YahnisElsts\\PluginUpdateChecker\\v6\\PucFactory',
+        'YahnisElsts\\PluginUpdateChecker\\v5\\PucFactory',
+    ];
+
+    $factory_class = null;
+    foreach ($factory_candidates as $candidate) {
+        if (class_exists($candidate)) {
+            $factory_class = $candidate;
+            break;
+        }
+    }
+
+    if (!$factory_class) {
+        return;
+    }
+
+    // @phpstan-ignore-next-line
+    $updateChecker = $factory_class::buildUpdateChecker(
+        'https://github.com/ThroooutProjects/wp-meta-pixel-events/',
+        MPE_PLUGIN_FILE,
+        'meta-pixel-events'
+    );
+
+    if (is_object($updateChecker) && method_exists($updateChecker, 'setBranch')) {
+        $updateChecker->setBranch('main');
+    }
+
+    // Optional: for private repos you can add a token.
+    // if (is_object($updateChecker) && method_exists($updateChecker, 'setAuthentication')) {
+    //     $updateChecker->setAuthentication('ghp_...');
+    // }
+}
+
+add_action('init', 'mpe_boot_updater');
