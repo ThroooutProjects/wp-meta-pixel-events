@@ -2,7 +2,7 @@
 /**
  * Plugin Name: Meta Pixel Event Tracker (Custom)
  * Description: Tracks AddToCart and AddToWishlist events properly using Meta Pixel
- * Version: 1.0
+ * Version: 1.1
  * Author: Throughout 
  * Plugin URI: https://www.throughout.io
  * Update URI: https://github.com/ThroooutProjects/wp-meta-pixel-events
