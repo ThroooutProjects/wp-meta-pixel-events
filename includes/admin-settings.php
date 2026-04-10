@@ -44,6 +44,14 @@ function mpe_register_settings(): void
         'default' => false,
     ]);
 
+    register_setting('mpe_settings', 'mpe_updater_github_token', [
+        'type' => 'string',
+        'sanitize_callback' => function ($value) {
+            return is_string($value) ? trim($value) : '';
+        },
+        'default' => '',
+    ]);
+
     $event_defaults = [
         'mpe_event_add_to_cart' => true,
         'mpe_event_add_to_wishlist' => true,
@@ -118,6 +126,9 @@ function mpe_register_settings(): void
     add_settings_field('mpe_advanced_matching_enabled', 'Advanced matching', 'mpe_render_field_advanced_matching', 'mpe-meta-pixel-events', 'mpe_settings_main');
     add_settings_field('mpe_events', 'Enabled events', 'mpe_render_field_events', 'mpe-meta-pixel-events', 'mpe_settings_main');
 
+    add_settings_section('mpe_settings_updates', 'Plugin updates', '__return_false', 'mpe-meta-pixel-events');
+    add_settings_field('mpe_updater_github_token', 'GitHub token', 'mpe_render_field_updater_github_token', 'mpe-meta-pixel-events', 'mpe_settings_updates');
+
     add_settings_section('mpe_settings_capi', 'Conversions API (Server-side)', '__return_false', 'mpe-meta-pixel-events');
 
     add_settings_field('mpe_capi_enabled', 'Enable CAPI', 'mpe_render_field_capi_enabled', 'mpe-meta-pixel-events', 'mpe_settings_capi');
@@ -158,6 +169,16 @@ function mpe_render_field_advanced_matching(): void
         Enable advanced matching (send email/phone when available)
     </label>
     <p class="description">Only enable if your consent/privacy setup allows sending this customer data to Meta.</p>
+    <?php
+}
+
+function mpe_render_field_updater_github_token(): void
+{
+    $value = (string) get_option('mpe_updater_github_token', '');
+    ?>
+    <input type="password" name="mpe_updater_github_token" value="<?php echo esc_attr($value); ?>" class="regular-text"
+        autocomplete="off" />
+    <p class="description">Only needed if the GitHub repository is private (GitHub API returns 404 without auth).</p>
     <?php
 }
 

@@ -134,6 +134,45 @@
     return Object.keys(params).length ? params : undefined;
   }
 
+  function mpeGetProductIdFromBtn(btnEl) {
+    return (
+      (btnEl &&
+        (btnEl.getAttribute("data-product_id") ||
+          btnEl.getAttribute("value") ||
+          btnEl.getAttribute("data-product"))) ||
+      ""
+    );
+  }
+
+  function mpeGetAtcDedupeKey(btnEl) {
+    var pid = mpeGetProductIdFromBtn(btnEl);
+    return "mpe_atc_" + (pid ? String(pid) : "unknown");
+  }
+
+  function mpeGetOrCreateEventId(key) {
+    try {
+      window.__mpeLastEventId = window.__mpeLastEventId || {};
+      window.__mpeLastEventIdTime = window.__mpeLastEventIdTime || {};
+
+      var now = Date.now();
+      var lastTime = window.__mpeLastEventIdTime[key] || 0;
+      var lastId = window.__mpeLastEventId[key] || "";
+
+      // Reuse briefly so click + added_to_cart can dedupe.
+      if (lastId && now - lastTime < 2000) {
+        return lastId;
+      }
+
+      var newId =
+        key + "_" + String(now) + "_" + Math.random().toString(16).slice(2);
+      window.__mpeLastEventId[key] = newId;
+      window.__mpeLastEventIdTime[key] = now;
+      return newId;
+    } catch (e) {
+      return undefined;
+    }
+  }
+
   function mpeIsAjaxAddToCart(btnEl) {
     return !!(
       btnEl &&
@@ -230,9 +269,11 @@
 
         if (mpeIsAjaxAddToCart(btn)) return;
 
-        mpeFireCooldown("mpe_atc_click", 800, function () {
+        var dedupeKey = mpeGetAtcDedupeKey(btn);
+        mpeFireCooldown(dedupeKey, 1200, function () {
           if (!mpeEventEnabled("addToCart")) return;
-          mpeFbqTrack("AddToCart", mpeBuildAddToCartParams(btn));
+          var eventId = mpeGetOrCreateEventId(dedupeKey);
+          mpeFbqTrack("AddToCart", mpeBuildAddToCartParams(btn), eventId);
         });
       },
       true,
@@ -248,15 +289,12 @@
             if (!btn) return;
 
             var params = mpeBuildAddToCartParams(btn);
-            var productId = btn.getAttribute("data-product_id") || "";
-            mpeFireCooldown(
-              "mpe_atc_ajax_" + String(productId),
-              1200,
-              function () {
-                if (!mpeEventEnabled("addToCart")) return;
-                mpeFbqTrack("AddToCart", params);
-              },
-            );
+            var dedupeKey = mpeGetAtcDedupeKey(btn);
+            mpeFireCooldown(dedupeKey, 1200, function () {
+              if (!mpeEventEnabled("addToCart")) return;
+              var eventId = mpeGetOrCreateEventId(dedupeKey);
+              mpeFbqTrack("AddToCart", params, eventId);
+            });
           } catch (e) {
             // no-op
           }
