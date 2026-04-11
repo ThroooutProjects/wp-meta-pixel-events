@@ -10,11 +10,7 @@ function mpe_get_pixel_id(): string
     $saved = is_string($saved) ? $saved : '';
     $saved = preg_replace('/[^0-9]/', '', $saved);
 
-    if ($saved !== '') {
-        return $saved;
-    }
-
-    return preg_replace('/[^0-9]/', '', (string) MPE_PIXEL_ID);
+    return $saved;
 }
 
 function mpe_get_client_ip_address(): string

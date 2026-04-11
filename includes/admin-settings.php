@@ -145,7 +145,7 @@ function mpe_render_field_pixel_id(): void
     ?>
     <input type="text" name="mpe_pixel_id" value="<?php echo esc_attr($value); ?>" class="regular-text"
         inputmode="numeric" />
-    <p class="description">Digits only. If left blank, defaults to the plugin’s built-in Pixel ID.</p>
+    <p class="description">Digits only. Required (no built-in default).</p>
     <?php
 }
 

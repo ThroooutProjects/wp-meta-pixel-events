@@ -7,6 +7,9 @@ if (!defined('ABSPATH')) {
 function mpe_load_meta_pixel(): void
 {
     $pixel_id = mpe_get_pixel_id();
+    if ($pixel_id === '') {
+        return;
+    }
 
     $advanced = [];
     if ((bool) get_option('mpe_advanced_matching_enabled', false)) {

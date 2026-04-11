@@ -13,7 +13,6 @@ if (!defined('ABSPATH')) {
 }
 
 define('MPE_VERSION', '1.0');
-define('MPE_PIXEL_ID', '1799375824327124');
 define('MPE_PLUGIN_FILE', __FILE__);
 define('MPE_PLUGIN_DIR', plugin_dir_path(__FILE__));
 define('MPE_PLUGIN_URL', plugin_dir_url(__FILE__));
